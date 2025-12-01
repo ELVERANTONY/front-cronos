@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { studentService } from '../../services/studentService';
 import { Search, Filter, MessageCircle, ChevronRight, Sparkles } from 'lucide-react';
+import CharacterCard from '../../components/student/CharacterCard';
 
 const ExploreCharacters = () => {
     const navigate = useNavigate();
@@ -82,7 +83,7 @@ const ExploreCharacters = () => {
     };
 
     return (
-        <div className="w-[92%] max-w-[2000px] mx-auto py-8 space-y-8 pb-20">
+        <div className="w-[92%] max-w-[2000px] mx-auto py-8 space-y-8 pb-40">
             {/* Header & Search */}
             <div className="flex flex-col md:flex-row gap-6 items-end justify-between">
                 <div>
@@ -153,44 +154,7 @@ const ExploreCharacters = () => {
             ) : characters.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {characters.map((char) => (
-                        <div
-                            key={char.id}
-                            onClick={() => navigate(`/student/chat/${char.id}`)}
-                            className="group relative bg-[#1e2330] rounded-[2rem] overflow-hidden cursor-pointer border border-white/5 hover:border-blue-500/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-500/10"
-                        >
-                            {/* Image Poster */}
-                            <div className="h-[22rem] relative overflow-hidden">
-                                <img
-                                    src={char.avatarUrl || char.imagenUrl || '/images/avatars/default.png'}
-                                    alt={char.name}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#1e2330] via-transparent to-transparent opacity-90"></div>
-
-                                {/* Floating Badge */}
-                                {char.categoryName && (
-                                    <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full text-[10px] font-bold text-white uppercase tracking-wider">
-                                        {char.categoryName}
-                                    </div>
-                                )}
-
-                                {/* Content Overlay */}
-                                <div className="absolute bottom-0 left-0 w-full p-6">
-                                    <h3 className="text-2xl font-bold text-white mb-2 leading-tight">{char.name}</h3>
-                                    <div className="flex items-center gap-2 text-blue-400 text-xs font-medium opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                        <span>Iniciar conversación</span>
-                                        <ChevronRight size={14} />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Action Button (Hidden by default, appears on hover or mobile) */}
-                            <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 scale-50 group-hover:scale-100">
-                                <button className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-blue-600/30 hover:bg-blue-500 transition-colors">
-                                    <MessageCircle size={20} fill="currentColor" />
-                                </button>
-                            </div>
-                        </div>
+                        <CharacterCard key={char.id} char={char} />
                     ))}
                 </div>
             ) : (

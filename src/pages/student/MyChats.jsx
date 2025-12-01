@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { studentService } from '../../services/studentService';
 import { MessageSquare, Clock, ArrowRight, Search } from 'lucide-react';
 import ChatInterface from './ChatInterface';
 
 const MyChats = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [sessions, setSessions] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedSession, setSelectedSession] = useState(null);
@@ -25,6 +26,24 @@ const MyChats = () => {
 
         fetchSessions();
     }, []);
+
+    // Handle navigation from Explore
+    useEffect(() => {
+        if (!isLoading && location.state?.startChatWith) {
+            const charId = location.state.startChatWith;
+            const existingSession = sessions.find(s => s.characterId === charId);
+
+            if (existingSession) {
+                setSelectedSession(existingSession);
+            } else {
+                // Create temporary session object for new chats
+                setSelectedSession({ characterId: charId });
+            }
+
+            // Optional: Clear state to prevent reopening on refresh? 
+            // window.history.replaceState({}, document.title)
+        }
+    }, [isLoading, location.state, sessions]);
 
     const filteredSessions = sessions.filter(session =>
         session.characterName.toLowerCase().includes(searchTerm.toLowerCase())

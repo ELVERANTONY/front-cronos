@@ -84,9 +84,9 @@ const StudentDashboard = () => {
                 </div>
 
                 {/* Decorative Image/Icon */}
-                <div className="absolute right-[-20px] bottom-[-20px] opacity-20 lg:opacity-100 lg:right-10 lg:bottom-10 transition-all duration-500 group-hover:scale-105 group-hover:rotate-3">
-                    <div className="w-48 h-48 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 blur-3xl absolute"></div>
-                    <img src="/images/logos/Cronos-digital-transparente.png" alt="Hero" className="relative w-40 h-40 object-contain drop-shadow-2xl" />
+                <div className="absolute right-0 top-0 bottom-0 w-1/3 flex items-center justify-center opacity-20 lg:opacity-100 transition-all duration-500 group-hover:scale-105">
+                    <div className="w-64 h-64 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 blur-3xl absolute opacity-50"></div>
+                    <img src="/images/logos/Cronos-digital-transparente.png" alt="Hero" className="relative w-56 h-auto object-contain drop-shadow-2xl" />
                 </div>
             </div>
 
@@ -120,7 +120,7 @@ const StudentDashboard = () => {
                         {recentSessions.map((session) => (
                             <div
                                 key={session.id}
-                                onClick={() => navigate(`/student/chat/${session.characterId}`)}
+                                onClick={() => navigate('/student/chats', { state: { startChatWith: session.characterId } })}
                                 className="min-w-[280px] bg-[#1e2330] p-5 rounded-[2rem] border border-white/5 cursor-pointer hover:border-blue-500/30 transition-all group snap-center"
                             >
                                 <div className="flex items-center gap-4 mb-4">

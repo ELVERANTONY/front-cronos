@@ -25,17 +25,7 @@ const StudentLayout = () => {
             <div className="flex-1 flex flex-col h-full overflow-hidden relative">
 
                 {/* Header Mobile/Desktop (Minimal) */}
-                <header className="absolute top-0 left-0 w-full h-20 flex items-center justify-between px-8 z-30 pointer-events-none">
-                    <div className="pointer-events-auto">
-                        <img
-                            src="/images/logos/Cronos-digital-transparente.png"
-                            alt="Cronos Logo"
-                            className="h-10 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]"
-                        />
-                    </div>
-                    {/* Page Title (Optional, maybe for mobile only) */}
-                    <span className="font-bold text-sm tracking-wide uppercase text-slate-500/50 hidden md:block">{pageTitle}</span>
-                </header>
+                {/* Header Removed as per user request */}
 
                 {/* Page Content */}
                 <main className="flex-1 relative overflow-hidden flex flex-col">
