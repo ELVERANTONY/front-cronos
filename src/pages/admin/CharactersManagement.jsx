@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import ConfirmationModal from '../../components/admin/ConfirmationModal';
+import Pagination from '../../components/admin/Pagination';
 import { adminService } from '../../services/adminService';
 import { useCharacterCreation } from '../../hooks/useCharacterCreation.jsx';
 
@@ -14,6 +15,12 @@ const CharactersManagement = () => {
     const [selectedCharacter, setSelectedCharacter] = useState(null);
     const [newCharName, setNewCharName] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
+
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+    const [pageSize] = useState(10);
 
     // Confirmation Modal State
     const [confirmModal, setConfirmModal] = useState({
@@ -36,15 +43,32 @@ const CharactersManagement = () => {
         loadData();
     }, []);
 
-    const loadData = async () => {
+    const loadData = async (page = currentPage) => {
         try {
             setIsLoading(true);
             const [charsData, catsData] = await Promise.all([
-                adminService.getCharacters(),
+                adminService.getCharacters({
+                    page,
+                    page_size: pageSize
+                }),
                 adminService.getCategories()
             ]);
-            setCharacters(charsData);
-            setCategories(catsData.filter(c => c.is_active));
+
+            // Handle paginated response
+            if (charsData.results) {
+                setCharacters(charsData.results);
+                setTotalCount(charsData.count);
+                setTotalPages(Math.ceil(charsData.count / pageSize));
+                setCurrentPage(page);
+            } else {
+                setCharacters(Array.isArray(charsData) ? charsData : []);
+                setTotalCount(Array.isArray(charsData) ? charsData.length : 0);
+                setTotalPages(1);
+            }
+
+            // Handle categories - could be paginated or array
+            const categoriesArray = catsData.results || catsData;
+            setCategories(Array.isArray(categoriesArray) ? categoriesArray.filter(c => c.is_active) : []);
         } catch (error) {
             console.error('Error loading data:', error);
         } finally {
@@ -69,7 +93,27 @@ const CharactersManagement = () => {
                 loadData();
             },
             (error) => {
-                alert(`Error al crear personaje: ${error}`);
+                console.error('❌ Error creating character:', error);
+                console.log('🔍 Error structure:', {
+                    hasResponse: !!error.response,
+                    hasData: !!error.response?.data,
+                    data: error.response?.data
+                });
+
+                // Extract validation error message
+                let errorMessage = 'Error al crear personaje';
+                if (error.response?.data) {
+                    const data = error.response.data;
+                    if (data.name && Array.isArray(data.name)) {
+                        errorMessage = `${data.name[0]}`;
+                    } else if (data.category && Array.isArray(data.category)) {
+                        errorMessage = `Categoría: ${data.category[0]}`;
+                    } else if (typeof data === 'string') {
+                        errorMessage = data;
+                    }
+                }
+                console.log('📢 Showing alert:', errorMessage);
+                alert(errorMessage);
             }
         );
     };
@@ -111,6 +155,7 @@ const CharactersManagement = () => {
         }
     };
 
+    // Client-side search - filters current page results
     const filteredCharacters = characters.filter(char =>
         char.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         char.category_name?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -246,6 +291,17 @@ const CharactersManagement = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination */}
+                {!isLoading && filteredCharacters.length > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        totalCount={totalCount}
+                        pageSize={pageSize}
+                        onPageChange={(page) => loadData(page)}
+                    />
+                )}
             </div>
 
             {/* Detail Modal */}

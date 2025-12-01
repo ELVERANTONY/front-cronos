@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { useActiveStudents } from '../../hooks/useActiveStudents';
+import { useTopCharacters } from '../../hooks/useTopCharacters';
 import { useAuth } from '../../hooks/useAuth';
-import { adminService } from '../../services/adminService';
 
 const AdminDashboard = () => {
-    const { count, activeStudents, isConnected } = useActiveStudents();
+    const { count, activeStudents, isConnected: isStudentsConnected } = useActiveStudents();
+    const { topCharacters, isLoading, isConnected: isCharactersConnected } = useTopCharacters();
     const { user } = useAuth();
-    const [stats, setStats] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
+    // const [stats, setStats] = useState(null); // Ya no se usa
+    // const [isLoading, setIsLoading] = useState(true); // Ya no se usa, viene del hook
 
+    /*
     useEffect(() => {
         loadDashboardStats();
     }, []);
@@ -17,15 +19,18 @@ const AdminDashboard = () => {
     const loadDashboardStats = async () => {
         try {
             setIsLoading(true);
-            const data = await adminService.getDashboardStats();
-            console.log('📊 Dashboard stats loaded:', data);
-            setStats(data);
+            // TODO: Endpoint no existe en Django aún
+            // const data = await adminService.getDashboardStats();
+            // console.log('📊 Dashboard stats loaded:', data);
+            // setStats(data);
+            setStats({ popular_characters: [] }); // Mock data for now
         } catch (error) {
             console.error('❌ Error loading dashboard stats:', error);
         } finally {
             setIsLoading(false);
         }
     };
+    */
 
     return (
         <AdminLayout>
@@ -51,9 +56,9 @@ const AdminDashboard = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                             </svg>
                         </div>
-                        <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold border ${isConnected ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
-                            <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`}></span>
-                            {isConnected ? 'EN VIVO' : 'OFFLINE'}
+                        <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold border ${isStudentsConnected ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
+                            <span className={`w-2 h-2 rounded-full ${isStudentsConnected ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`}></span>
+                            {isStudentsConnected ? 'EN VIVO' : 'OFFLINE'}
                         </div>
                     </div>
 
@@ -74,15 +79,19 @@ const AdminDashboard = () => {
                             <h3 className="text-xl font-bold text-white">Personajes Más Populares</h3>
                             <p className="text-sm text-slate-400">Top 5 personajes con más interacciones</p>
                         </div>
+                        <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold border ${isCharactersConnected ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${isCharactersConnected ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`}></span>
+                            {isCharactersConnected ? 'LIVE' : 'OFF'}
+                        </div>
                     </div>
 
                     {isLoading ? (
                         <div className="flex items-center justify-center py-12">
                             <div className="text-slate-500 animate-pulse">Cargando estadísticas...</div>
                         </div>
-                    ) : stats?.popular_characters && stats.popular_characters.length > 0 ? (
+                    ) : topCharacters && topCharacters.length > 0 ? (
                         <div className="space-y-3">
-                            {stats.popular_characters.slice(0, 5).map((character, index) => (
+                            {topCharacters.slice(0, 5).map((character, index) => (
                                 <div key={character.id} className="bg-[#0B0E1E] border border-slate-800/50 rounded-xl p-4 hover:border-slate-700 transition-all group">
                                     <div className="flex items-center gap-4">
                                         <div className="flex items-center gap-3 flex-1">

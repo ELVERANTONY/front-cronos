@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '../hooks/useAuth';
 import Button from '../components/Button';
+import CronosAssistant from '../components/assistant/CronosAssistant';
 
 const Dashboard = () => {
     const { logout } = useAuth();
@@ -79,6 +80,9 @@ const Dashboard = () => {
                     </div>
                 </div>
             </main>
+
+            {/* Virtual Assistant */}
+            <CronosAssistant />
         </div>
     );
 };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import SuccessToast from '../../components/admin/SuccessToast';
 import ConfirmationModal from '../../components/admin/ConfirmationModal';
+import Pagination from '../../components/admin/Pagination';
 import { adminService } from '../../services/adminService';
 
 const StudentsManagement = () => {
@@ -14,6 +15,12 @@ const StudentsManagement = () => {
     const [showSuccessToast, setShowSuccessToast] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [editingStudent, setEditingStudent] = useState(null);
+
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
+    const [pageSize] = useState(10);
 
     // Confirmation Modal State
     const [confirmModal, setConfirmModal] = useState({
@@ -37,16 +44,28 @@ const StudentsManagement = () => {
         loadStudents();
     }, []);
 
-    const loadStudents = async () => {
+    const loadStudents = async (page = currentPage) => {
         try {
             setIsLoading(true);
             setError(null);
-            const data = await adminService.getStudents();
+            const data = await adminService.getStudents({
+                page,
+                page_size: pageSize
+            });
             console.log('✅ Students loaded:', data);
 
-            // Handle both array and paginated response
-            const studentsArray = Array.isArray(data) ? data : (data.results || []);
-            setStudents(studentsArray);
+            // Handle paginated response from Django REST Framework
+            if (data.results) {
+                setStudents(data.results);
+                setTotalCount(data.count);
+                setTotalPages(Math.ceil(data.count / pageSize));
+                setCurrentPage(page);
+            } else {
+                // Fallback for non-paginated response
+                setStudents(Array.isArray(data) ? data : []);
+                setTotalCount(Array.isArray(data) ? data.length : 0);
+                setTotalPages(1);
+            }
         } catch (error) {
             console.error('❌ Error loading students:', error);
             setError(error.message);
@@ -176,6 +195,7 @@ const StudentsManagement = () => {
     };
 
 
+    // Client-side search - filters current page results
     const filteredStudents = students.filter(student =>
         student.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         student.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -336,6 +356,17 @@ const StudentsManagement = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination */}
+                {!isLoading && filteredStudents.length > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        totalCount={totalCount}
+                        pageSize={pageSize}
+                        onPageChange={(page) => loadStudents(page)}
+                    />
+                )}
             </div>
 
             {/* Premium Create Modal */}

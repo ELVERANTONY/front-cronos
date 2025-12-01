@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const studentApi = axios.create({
-    baseURL: 'http://localhost:8005/api',
+    baseURL: '/api',  // Uses Vite proxy to route to Spring Boot chat/user service (port 8005)
     headers: {
         'Content-Type': 'application/json',
     },

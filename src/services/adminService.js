@@ -79,6 +79,11 @@ adminApi.interceptors.response.use(
             console.error('⚙️ Request setup error:', error.message);
         }
 
+        // Log full error data for debugging
+        if (error.response?.data) {
+            console.error('🔍 Full error details:', JSON.stringify(error.response.data, null, 2));
+        }
+
         return Promise.reject(error);
     }
 );
@@ -86,7 +91,14 @@ adminApi.interceptors.response.use(
 export const adminService = {
     // ========== CHARACTERS ==========
     getCharacters: async (params = {}) => {
-        const response = await adminApi.get('/characters/', { params });
+        const response = await adminApi.get('/characters/', {
+            params: {
+                page: params.page || 1,
+                page_size: params.page_size || 10,
+                search: params.search,
+                ...params
+            }
+        });
         return response.data;
     },
 
@@ -101,6 +113,7 @@ export const adminService = {
     },
 
     createCharacterAsync: async (name, categoryId) => {
+        console.log('📤 Creating character with:', { name, category: categoryId });
         const response = await adminApi.post('/characters/create_with_ai_async/', {
             name,
             category: categoryId,
@@ -120,7 +133,14 @@ export const adminService = {
 
     // ========== STUDENTS ==========
     getStudents: async (params = {}) => {
-        const response = await adminApi.get('/students/', { params });
+        const response = await adminApi.get('/students/', {
+            params: {
+                page: params.page || 1,
+                page_size: params.page_size || 10,
+                search: params.search,
+                ...params
+            }
+        });
         return response.data;
     },
 
@@ -144,6 +164,19 @@ export const adminService = {
     toggleStudentActive: async (id) => {
         const response = await adminApi.post(`/students/${id}/toggle_active/`);
         return response.data;
+    },
+
+    /**
+     * Obtiene los personajes más populares (Top 5)
+     */
+    getTopCharacters: async () => {
+        try {
+            const response = await adminApi.get('/characters/top_interactions/');
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching top characters:', error);
+            throw error;
+        }
     },
 
     // ========== CATEGORIES ==========

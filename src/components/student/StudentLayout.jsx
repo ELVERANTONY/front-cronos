@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import StudentDock from './StudentDock';
+import CronosAssistant from '../assistant/CronosAssistant';
 import { Menu } from 'lucide-react';
 
 const StudentLayout = () => {
@@ -48,8 +49,8 @@ const StudentLayout = () => {
                     </div>
 
                     <div className={`relative z-10 w-full h-full flex flex-col ${location.pathname.includes('/chat/') || location.pathname.includes('/call/')
-                            ? 'overflow-hidden'
-                            : 'overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent'
+                        ? 'overflow-hidden'
+                        : 'overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent'
                         }`}>
                         <Outlet />
                     </div>
@@ -59,6 +60,9 @@ const StudentLayout = () => {
                 {!location.pathname.includes('/chat/') && !location.pathname.includes('/call/') && (
                     <StudentDock />
                 )}
+
+                {/* Virtual Assistant - Persistent across student pages */}
+                <CronosAssistant />
             </div>
         </div>
     );

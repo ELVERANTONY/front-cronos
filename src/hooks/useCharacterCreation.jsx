@@ -25,15 +25,17 @@ export const CharacterCreationProvider = ({ children }) => {
             // Step 2: Poll for status
             const interval = setInterval(async () => {
                 try {
-                    const status = await adminService.getJobStatus(job_id);
+                    const response = await adminService.getJobStatus(job_id);
+                    console.log('📊 Job status response:', response);
 
-                    setProgress(status.data.progress);
-                    setStatusMessage(status.data.message);
+                    const status = response.data;
+                    setProgress(status.progress || 0);
+                    setStatusMessage(status.message || 'Procesando...');
 
-                    if (status.data.status === 'completed') {
+                    if (status.status === 'completed') {
                         clearInterval(interval);
                         setIsCreating(false);
-                        setIsSuccess(true); // Show success state
+                        setIsSuccess(true);
                         setProgress(100);
                         setStatusMessage('¡Personaje creado exitosamente!');
 
@@ -43,25 +45,26 @@ export const CharacterCreationProvider = ({ children }) => {
                             setStatusMessage('');
                         }, 5000);
 
-                        // Success callback
+                        // Success callback - handle different response structures
                         if (onSuccess) {
-                            onSuccess(status.data.data.character_id);
+                            const characterId = status.data?.character_id || status.character_id;
+                            onSuccess(characterId);
                         }
-                    } else if (status.data.status === 'failed') {
+                    } else if (status.status === 'failed') {
                         clearInterval(interval);
                         setIsCreating(false);
                         setStatusMessage('Error al crear personaje');
 
-                        // Error callback
                         if (onError) {
-                            onError(status.data.error);
+                            onError(status.error || 'Error desconocido');
                         }
                     }
                 } catch (err) {
+                    console.error('Error polling job status:', err);
                     clearInterval(interval);
                     setIsCreating(false);
                     if (onError) {
-                        onError(err.message);
+                        onError(err.message || 'Error al verificar estado del job');
                     }
                 }
             }, 2500); // Poll every 2.5 seconds
@@ -71,7 +74,8 @@ export const CharacterCreationProvider = ({ children }) => {
             setIsCreating(false);
             setStatusMessage('Error al iniciar creación');
             if (onError) {
-                onError(error.message);
+                // Pass the full error object so we can access error.response.data
+                onError(error);
             }
         }
     }, []);

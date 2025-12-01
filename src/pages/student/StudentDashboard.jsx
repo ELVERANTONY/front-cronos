@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { studentService } from '../../services/studentService';
+import { useSessionHeartbeat } from '../../hooks/useSessionHeartbeat';
 import { Play, Clock, TrendingUp, ChevronRight, MessageSquare } from 'lucide-react';
 
 const StudentDashboard = () => {
+    useSessionHeartbeat(); // Mantener sesión activa
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [recentSessions, setRecentSessions] = useState([]);

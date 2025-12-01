@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { authService } from '../services/authService';
 
+import { sessionService } from '../services/sessionService';
+
 export const useAuth = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -34,10 +36,16 @@ export const useAuth = () => {
         }
     };
 
-    const logout = () => {
-        localStorage.removeItem('jwt_token');
-        localStorage.removeItem('user');
-        window.location.href = '/';
+    const logout = async () => {
+        try {
+            await sessionService.closeSession();
+        } catch (error) {
+            console.error('Error closing session:', error);
+        } finally {
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        }
     };
 
     return { login, logout, isLoading, error };

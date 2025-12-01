@@ -7,24 +7,25 @@ export const useActiveStudents = () => {
 
     useEffect(() => {
         const token = localStorage.getItem('jwt_token');
+        console.log('🔍 useActiveStudents token check:', token ? 'Token exists' : 'No token');
         if (!token) return;
 
-        const baseURL = import.meta.env.VITE_ADMIN_API_URL || 'http://localhost:8000/api';
-        // Append token as query param since EventSource doesn't support headers
-        const url = `${baseURL}/students/active-stream/?token=${token}`;
+        // Use correct Django endpoint path
+        const url = `/admin-api/dashboard/active_students_stream/?token=${token}`;
+        console.log('🔗 Connecting to SSE:', url);
 
         const eventSource = new EventSource(url);
 
         eventSource.onopen = () => {
             setIsConnected(true);
-            console.log('SSE connection established');
+            console.log('✅ SSE connection established');
         };
 
         eventSource.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
                 setActiveStudents(data.students || []);
-                setCount(data.active_count || 0);
+                setCount(data.active_students || 0);
             } catch (error) {
                 console.error('Error parsing SSE data:', error);
             }

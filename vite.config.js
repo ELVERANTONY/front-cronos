@@ -7,14 +7,18 @@ export default defineConfig({
   server: {
     proxy: {
       '/admin-api': {
-        target: 'http://localhost:8000/api',
+        target: 'http://localhost:8000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/admin-api/, ''),
+        rewrite: (path) => path.replace(/^\/admin-api/, '/api'),
+      },
+      '/api/auth': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
       },
       '/api': {
-        target: 'http://localhost:8080/api',
+        target: 'http://localhost:8005',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: (path) => path.replace(/^\/api/, '/api'),
       }
     }
   }
