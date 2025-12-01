@@ -141,6 +141,10 @@ const MyChats = () => {
                         characterId={selectedSession.characterId}
                         onBack={() => setSelectedSession(null)}
                         className="w-full h-full border-none shadow-none rounded-none"
+                        onMessageSent={() => {
+                            // Refresh sessions to show the new one in the list
+                            studentService.getMySessions().then(data => setSessions(data));
+                        }}
                     />
                 ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-center p-8 relative overflow-hidden">

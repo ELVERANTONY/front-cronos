@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import ConfirmationModal from '../../components/admin/ConfirmationModal';
 import { adminService } from '../../services/adminService';
+import { useToast } from '../../context/ToastContext';
 
 const CategoriesManagement = () => {
+    const { addToast } = useToast();
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -78,10 +80,10 @@ const CategoriesManagement = () => {
         try {
             if (editingCategory) {
                 await adminService.updateCategory(editingCategory.id, formData);
-                alert('✅ Categoría actualizada exitosamente');
+                addToast('Categoría actualizada exitosamente', 'success');
             } else {
                 await adminService.createCategory(formData);
-                alert('✅ Categoría creada exitosamente');
+                addToast('Categoría creada exitosamente', 'success');
             }
 
             setShowCreateModal(false);
@@ -91,7 +93,7 @@ const CategoriesManagement = () => {
         } catch (error) {
             console.error('❌ Category Submit Error:', error);
             const errorMsg = error.response?.data?.detail || error.response?.data?.name?.[0] || error.message;
-            alert('Error al guardar categoría: ' + errorMsg);
+            addToast('Error al guardar categoría: ' + errorMsg, 'error');
         }
     };
 
@@ -110,12 +112,12 @@ const CategoriesManagement = () => {
             onConfirm: async () => {
                 try {
                     await adminService.toggleCategoryActive(category.id);
-                    // alert(`✅ Categoría ${action === 'desactivar' ? 'desactivada' : 'activada'} exitosamente`);
+                    addToast(`Categoría ${action === 'desactivar' ? 'desactivada' : 'activada'} exitosamente`, 'success');
                     loadCategories();
                     setConfirmModal(prev => ({ ...prev, isOpen: false }));
                 } catch (error) {
                     console.error('❌ Error toggling category:', error);
-                    alert('Error al cambiar estado: ' + error.message);
+                    addToast('Error al cambiar estado: ' + error.message, 'error');
                 }
             }
         });

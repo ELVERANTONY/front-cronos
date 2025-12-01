@@ -4,6 +4,7 @@ import ConfirmationModal from '../../components/admin/ConfirmationModal';
 import Pagination from '../../components/admin/Pagination';
 import { adminService } from '../../services/adminService';
 import { useCharacterCreation } from '../../hooks/useCharacterCreation.jsx';
+import CustomSelect from '../../components/admin/CustomSelect';
 
 const CharactersManagement = () => {
     const [characters, setCharacters] = useState([]);
@@ -412,21 +413,12 @@ const CharactersManagement = () => {
                             <div>
                                 <label className="block text-sm font-bold text-slate-300 mb-2">Categoría</label>
                                 <div className="relative">
-                                    <select
+                                    <CustomSelect
+                                        options={categories.map(cat => ({ value: cat.id, label: cat.name }))}
                                         value={selectedCategory}
-                                        onChange={(e) => setSelectedCategory(e.target.value)}
-                                        className="w-full px-4 py-3.5 bg-[#0B0E1E] border border-slate-700 rounded-xl text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none transition-all appearance-none"
-                                    >
-                                        <option value="">Selecciona una categoría</option>
-                                        {categories.map(cat => (
-                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                        ))}
-                                    </select>
-                                    <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500">
-                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </div>
+                                        onChange={(val) => setSelectedCategory(val)}
+                                        placeholder="Selecciona una categoría"
+                                    />
                                 </div>
                             </div>
 

@@ -4,7 +4,7 @@ import { studentService } from '../../services/studentService';
 import { useChatWebSocket } from '../../hooks/useChatWebSocket';
 import { ArrowLeft, Send, MoreVertical, Volume2, Phone } from 'lucide-react';
 
-const ChatInterface = ({ characterId: propCharacterId, onBack, className }) => {
+const ChatInterface = ({ characterId: propCharacterId, onBack, className, onMessageSent }) => {
     const { characterId: paramCharacterId } = useParams();
     const characterId = propCharacterId || paramCharacterId;
     const navigate = useNavigate();
@@ -102,6 +102,8 @@ const ChatInterface = ({ characterId: propCharacterId, onBack, className }) => {
                     timestamp: new Date().toISOString()
                 }]);
                 setStreamingContent('');
+                // Notify parent that a message (response) was received/completed
+                if (onMessageSent) onMessageSent();
                 break;
 
             case 'ERROR':
@@ -116,9 +118,11 @@ const ChatInterface = ({ characterId: propCharacterId, onBack, className }) => {
                         sender: 'CHARACTER',
                         timestamp: new Date().toISOString()
                     }]);
+                    // Notify parent
+                    if (onMessageSent) onMessageSent();
                 }
         }
-    }, [streamingContent]);
+    }, [streamingContent, onMessageSent]);
 
     const { sendMessage, isConnected } = useChatWebSocket(token, handleWebSocketMessage);
 
@@ -144,6 +148,9 @@ const ChatInterface = ({ characterId: propCharacterId, onBack, className }) => {
         });
 
         setInputText('');
+
+        // Notify parent immediately so the session appears in the list
+        if (onMessageSent) onMessageSent();
     };
 
     const handleCall = () => {

@@ -3,13 +3,16 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
+import { ToastProvider } from './context/ToastContext.jsx'
 import { CharacterCreationProvider } from './hooks/useCharacterCreation.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <CharacterCreationProvider>
-        <App />
+        <ToastProvider>
+          <App />
+        </ToastProvider>
       </CharacterCreationProvider>
     </BrowserRouter>
   </StrictMode>,
